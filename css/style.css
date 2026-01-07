@@ -1,0 +1,134 @@
+/* Base */
+.app-body {
+  min-height: 100vh;
+  background: var(--app-bg);
+  background-image: var(--app-bg-image);
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+.app-header {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background: color-mix(in oklab, var(--bs-body-bg) 75%, transparent);
+}
+
+/* Tema (controlado no JS via data-bs-theme + CSS vars) */
+:root {
+  --app-bg: #f6f7fb;
+  --app-bg-image: radial-gradient(circle at 10% 20%, rgba(255, 166, 0, 0.20), transparent 30%),
+                  radial-gradient(circle at 80% 10%, rgba(0, 110, 255, 0.18), transparent 35%),
+                  radial-gradient(circle at 30% 90%, rgba(0, 180, 120, 0.10), transparent 40%);
+}
+
+html[data-bs-theme="dark"] {
+  --app-bg: #0b0f18;
+  --app-bg-image: radial-gradient(circle at 10% 20%, rgba(255, 166, 0, 0.14), transparent 30%),
+                  radial-gradient(circle at 80% 10%, rgba(0, 110, 255, 0.12), transparent 35%),
+                  radial-gradient(circle at 30% 90%, rgba(0, 180, 120, 0.10), transparent 40%);
+}
+
+/* Keypad */
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: .5rem;
+}
+
+.keypad .key {
+  padding: .9rem .75rem;
+  font-weight: 700;
+  border-radius: .9rem;
+}
+
+@media (max-width: 576px) {
+  .keypad .key {
+    padding: .75rem .6rem;
+  }
+}
+
+/* Cart table: qty controls */
+.qty-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+}
+
+.qty-controls .qty-value {
+  min-width: 52px;
+  text-align: center;
+  font-weight: 700;
+}
+
+.mono {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ==========================
+   Carrinho com scroll interno
+   - Mostra ~2 itens e o resto rola
+   ========================== */
+:root{
+  --cart-head-h: 44px;   /* altura aproximada do cabeçalho da tabela */
+  --cart-row-h: 74px;    /* altura aproximada de 1 item do carrinho */
+  --cart-extra: 8px;     /* folga para bordas/padding */
+}
+
+.cart-scroll{
+  max-height: calc(var(--cart-head-h) + (var(--cart-row-h) * 2) + var(--cart-extra));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* Deixa o cabeçalho sempre visível enquanto rola */
+.cart-scroll thead th{
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--bs-body-bg);
+}
+
+/* Ajuda a segurar o “tamanho” dos itens para caber ~2 */
+.cart-scroll tbody tr{
+  height: var(--cart-row-h);
+}
+
+
+/* ==========================
+   Alertas flutuantes (toasts)
+   ========================== */
+.toast-area{
+  position: fixed;
+  top: 88px;                 /* abaixo do header sticky */
+  right: 16px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(420px, calc(100vw - 32px));
+  pointer-events: none;      /* clique só nos alertas */
+}
+
+.toast-area .alert{
+  pointer-events: auto;
+  margin: 0;
+  box-shadow: 0 12px 30px rgba(0,0,0,.25);
+  border: 1px solid color-mix(in oklab, var(--bs-border-color) 70%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background: color-mix(in oklab, var(--bs-body-bg) 75%, transparent);
+}
+
+/* Em telas pequenas: centraliza e joga pro fundo */
+@media (max-width: 576px){
+  .toast-area{
+    top: auto;
+    bottom: 16px;
+    left: 16px;
+    right: 16px;
+    width: auto;
+  }
+}
+
+

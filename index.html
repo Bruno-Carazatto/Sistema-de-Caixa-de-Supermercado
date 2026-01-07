@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="pt-br" data-bs-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
+  <title>Caixa de Supermercado (POS)</title>
+  <link rel="icon" href="img/icon.png" type="image/png">
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Seu CSS -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body class="app-body">
+  <header class="sticky-top app-header border-bottom">
+    <div class="container-fluid py-3">
+      <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+        <div>
+          <h1 class="h4 mb-0 fw-bold">🛒 Caixa de Supermercado</h1>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+          <button id="btnTheme" class="btn btn-outline-primary btn-sm" type="button" aria-label="Alternar tema">
+            🌙 Tema
+          </button>
+
+          <button id="btnOpenHistory" class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="offcanvas" data-bs-target="#historyCanvas" aria-controls="historyCanvas">
+            🧾 Histórico
+          </button>
+
+          <button id="btnClearAll" class="btn btn-outline-danger btn-sm" type="button" title="Limpar carrinho e campos">
+            🧹 Limpar
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container-fluid my-3">
+    <div class="row g-3">
+      <!-- COLUNA ESQUERDA: PRODUTOS -->
+      <section class="col-12 col-lg-5">
+        <div class="card shadow-sm h-100">
+          <div class="card-header d-flex align-items-center justify-content-between gap-2">
+            <div class="fw-semibold">🧺 Produtos</div>
+            <span class="badge text-bg-primary" id="productsCount">0</span>
+          </div>
+
+          <div class="card-body">
+            <label class="form-label">Buscar produto</label>
+            <div class="input-group mb-3">
+              <span class="input-group-text">🔎</span>
+              <input id="productSearch" type="text" class="form-control" placeholder="Digite nome ou código..." autocomplete="off">
+              <button id="btnClearSearch" class="btn btn-outline-secondary" type="button">Limpar</button>
+            </div>
+
+            <div class="alert alert-info py-2 mb-3" role="status">
+              Dica: clique em <strong>Adicionar</strong> para ir ao caixa. Use o teclado numérico para quantidades/valor pago.
+            </div>
+
+            <div class="table-responsive">
+              <table class="table table-sm align-middle">
+                <thead>
+                  <tr class="text-body-secondary">
+                    <th style="width: 90px;">Código</th>
+                    <th>Produto</th>
+                    <th class="text-end" style="width: 120px;">Preço</th>
+                    <th class="text-end" style="width: 120px;">Ação</th>
+                  </tr>
+                </thead>
+                <tbody id="productsTbody">
+                  <!-- JS injeta -->
+                </tbody>
+              </table>
+            </div>
+
+            <hr class="my-3">
+
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+              <div class="text-body-secondary small">
+                🧠 Produtos mockados (p/ projeto). Depois dá pra trocar por API/BD.
+              </div>
+              <button id="btnResetProducts" class="btn btn-outline-secondary btn-sm" type="button">
+                ♻️ Resetar produtos
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- COLUNA DIREITA: CAIXA -->
+      <section class="col-12 col-lg-7">
+        <div class="card shadow-sm h-100">
+          <div class="card-header d-flex flex-wrap align-items-center justify-content-between gap-2">
+            <div class="fw-semibold">💳 Caixa</div>
+            <div class="d-flex align-items-center gap-2">
+              <span class="badge text-bg-success" id="cartItemsCount">0 item(s)</span>
+              <button id="btnFinalize" class="btn btn-success btn-sm" type="button">
+                ✅ Finalizar Venda
+              </button>
+            </div>
+          </div>
+
+          <div class="card-body">
+
+            <!-- CARRINHO -->
+            <div class="table-responsive mb-3 cart-scroll">
+            <table class="table align-middle mb-0">
+                <thead>
+                  <tr class="text-body-secondary">
+                    <th>Item</th>
+                    <th class="text-center" style="width: 170px;">Qtd</th>
+                    <th class="text-end" style="width: 140px;">Preço</th>
+                    <th class="text-end" style="width: 140px;">Subtotal</th>
+                    <th class="text-end" style="width: 90px;">Rem</th>
+                  </tr>
+                </thead>
+                <tbody id="cartTbody">
+                  <!-- JS injeta -->
+                </tbody>
+              </table>
+            </div>
+
+            <div class="row g-3">
+              <!-- PAGAMENTO -->
+              <div class="col-12 col-xl-7">
+                <div class="p-3 rounded-3 border bg-body-tertiary">
+                  <div class="d-flex align-items-center justify-content-between">
+                    <div class="fw-semibold">Pagamento</div>
+                    <small class="text-body-secondary">Selecione forma e valor pago</small>
+                  </div>
+
+                  <div class="row g-2 mt-1">
+                    <div class="col-12 col-md-6">
+                      <label class="form-label">Forma</label>
+                      <select id="paymentMethod" class="form-select">
+                        <option value="dinheiro">💵 Dinheiro</option>
+                        <option value="pix">⚡ Pix</option>
+                        <option value="cartao">💳 Cartão</option>
+                      </select>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                      <label class="form-label">Valor pago</label>
+                      <div class="input-group">
+                        <span class="input-group-text">R$</span>
+                        <input id="paidValue" type="text" class="form-control" inputmode="decimal" placeholder="0,00" aria-label="Valor pago">
+                        <button id="btnFocusPaid" class="btn btn-outline-secondary" type="button" title="Focar no valor pago">🎯</button>
+                      </div>
+                      <div class="form-text">Use o teclado numérico para digitar.</div>
+                    </div>
+                  </div>
+
+                  <hr class="my-3">
+
+                  <div class="d-flex flex-wrap justify-content-between gap-2">
+                    <div>
+                      <div class="text-body-secondary small">Total</div>
+                      <div class="h4 mb-0" id="totalValue">R$ 0,00</div>
+                    </div>
+
+                    <div class="text-end">
+                      <div class="text-body-secondary small">Troco</div>
+                      <div class="h4 mb-0" id="changeValue">R$ 0,00</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- TECLADO NUMÉRICO -->
+              <div class="col-12 col-xl-5">
+                <div class="p-3 rounded-3 border bg-body-tertiary">
+                  <div class="d-flex align-items-center justify-content-between">
+                    <div class="fw-semibold">⌨️ Teclado numérico</div>
+                    <small class="text-body-secondary">Campo ativo: <span id="activeFieldLabel" class="fw-semibold">Quantidade</span></small>
+                  </div>
+                  
+
+                  <div class="d-flex flex-wrap gap-2 mt-2">
+                    <button id="btnFocusQty" class="btn btn-outline-primary btn-sm" type="button">🎯 Quantidade</button>
+                    <button id="btnFocusPaid2" class="btn btn-outline-primary btn-sm" type="button">🎯 Valor pago</button>
+                    <button id="btnBackspace" class="btn btn-outline-secondary btn-sm ms-auto" type="button" title="Apagar 1">⌫</button>
+                    <button id="btnClearKeypad" class="btn btn-outline-danger btn-sm" type="button" title="Limpar campo">🧽</button>
+                  </div>
+
+                  <div class="keypad mt-3" role="group" aria-label="Teclado numérico">
+                    <button class="key btn btn-outline-secondary" data-key="7" type="button">7</button>
+                    <button class="key btn btn-outline-secondary" data-key="8" type="button">8</button>
+                    <button class="key btn btn-outline-secondary" data-key="9" type="button">9</button>
+                    <button class="key btn btn-outline-secondary" data-key="4" type="button">4</button>
+                    <button class="key btn btn-outline-secondary" data-key="5" type="button">5</button>
+                    <button class="key btn btn-outline-secondary" data-key="6" type="button">6</button>
+                    <button class="key btn btn-outline-secondary" data-key="1" type="button">1</button>
+                    <button class="key btn btn-outline-secondary" data-key="2" type="button">2</button>
+                    <button class="key btn btn-outline-secondary" data-key="3" type="button">3</button>
+                    <button class="key btn btn-outline-secondary" data-key="0" type="button">0</button>
+                    <button class="key btn btn-outline-secondary" data-key="," type="button">,</button>
+                    <button class="key btn btn-primary" data-key="enter" type="button">OK</button>
+                  </div>
+                  
+
+                  <div class="form-text mt-2">
+                    Dica: para quantidade, use números inteiros. Para valor pago, use <strong>,</strong>.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <hr class="my-3">
+
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+              <div class="text-body-secondary small">
+                💾 Carrinho salvo automaticamente (localStorage).
+              </div>
+              <div class="d-flex gap-2">
+                <button id="btnExportCart" class="btn btn-outline-secondary btn-sm" type="button" title="Exporta o carrinho atual em CSV (itens)">
+                  ⬇️ CSV (carrinho)
+                </button>
+                <button id="btnOpenHistory2" class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="offcanvas" data-bs-target="#historyCanvas" aria-controls="historyCanvas">
+                  🧾 Histórico
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- OFFCANVAS: HISTÓRICO -->
+  <div class="offcanvas offcanvas-end" tabindex="-1" id="historyCanvas" aria-labelledby="historyCanvasLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="historyCanvasLabel">🧾 Histórico de Vendas</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Fechar"></button>
+    </div>
+    <div class="offcanvas-body">
+      <div class="d-flex flex-wrap gap-2 mb-3">
+        <button id="btnExportHistory" class="btn btn-outline-primary btn-sm" type="button">⬇️ Exportar CSV (histórico)</button>
+        <button id="btnClearHistory" class="btn btn-outline-danger btn-sm ms-auto" type="button">🗑️ Limpar histórico</button>
+      </div>
+
+      <div class="text-body-secondary small mb-2">
+        Mostrando as vendas mais recentes primeiro.
+      </div>
+
+      <div id="historyList" class="vstack gap-2">
+        <!-- JS injeta -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Seu JS -->
+  <script src="js/script.js"></script>
+
+  <!-- ALERTAS FLUTUANTES (TOASTS) -->
+  <div id="alertArea" class="toast-area" aria-live="polite" aria-atomic="true"></div>
+</body>
+</html>
